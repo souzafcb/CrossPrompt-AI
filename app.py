@@ -1,0 +1,1 @@
+<substituiremos com o conteúdo do canvas em próxima célula>

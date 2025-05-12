@@ -1,0 +1,8 @@
+streamlit
+langchain
+langchain-ollama
+langchain-community
+faiss-cpu
+duckduckgo-search
+huggingface-hub
+sentence-transformers
