@@ -7,7 +7,11 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.schema.runnable import RunnableLambda
 import json
 import os
-
+from langchain.tools.ddg_search.tool import DuckDuckGoSearchRun
+from langchain.chains import LLMChain
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.docstore.document import Document
 st.set_page_config(layout="wide")
 st.title("🔗 Cross-Prompt IA com Memória e Enriquecimento Web")
 
@@ -21,15 +25,23 @@ embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-Mi
 vectorstore = FAISS.load_local("rag_index", embeddings=embedding_model) if os.path.exists("rag_index") else FAISS.from_texts([""], embedding_model)
 
 # Web Retriever
+
+
+search = DuckDuckGoSearchRun()
+
 def retrieve_web_context(query: str):
-    retriever = WebResearchRetriever.from_llm_and_tools(
-        llm=llm_1,
-        search_sources=["duckduckgo"],
-        vectorstore=vectorstore,
-        k=3
-    )
-    documents = retriever.invoke({"question": query})
-    return "\n".join([doc.page_content for doc in documents])
+    results = search.run(query)
+    if isinstance(results, str):
+        documents = [Document(page_content=results)]
+    else:
+        documents = [Document(page_content=res) for res in results]
+
+    # Opcional: salvar no vetor para reuso posterior
+    texts = [doc.page_content for doc in documents]
+    if texts:
+        vectorstore.add_texts(texts)
+
+    return "\n".join(texts[:3])
 
 # PROMPTS
 prompt_template_1 = PromptTemplate.from_template("""
