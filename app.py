@@ -127,4 +127,3 @@ if exportar:
         if "avaliacao" in context:
             f.write(f"## Avaliação Crítica\n{context['avaliacao']}\n\n")
     st.success("✅ Resultado exportado como 'resultado_crossprompt.md'")
-<substituiremos com o conteúdo do canvas em próxima célula>
